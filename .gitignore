@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+app/build/
+captures/
+
+# 本地配置(含本机 SDK 路径, 不应提交)
+local.properties
+*.iml
+.idea/
+.kotlin/
+
+# 构建产物
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+*.log
+
+# 崩溃日志
+crash.log

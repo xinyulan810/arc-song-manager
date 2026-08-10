@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">arc自制谱管理工具</string>
+
+    <string name="select_archive">选择 zip/rar 压缩包</string>
+    <string name="select_game_dir">选择/更换游戏目录</string>
+    <string name="import_songs">开始导入</string>
+    <string name="importing">导入中…</string>
+    <string name="rescan">重新识别</string>
+    <string name="status_no_archive">尚未选择压缩包</string>
+
+    <string name="file_type_aff">谱面 (.aff)</string>
+    <string name="file_type_jacket">歌曲封面</string>
+    <string name="file_type_jacket_thumb">封面_256</string>
+    <string name="file_type_bg">bg背景</string>
+    <string name="file_type_audio">音乐 (.ogg)</string>
+    <string name="file_type_songlist">songlist 片段</string>
+    <string name="file_type_unknown">未识别</string>
+    <string name="file_type_ignore">忽略</string>
+
+    <string name="songlist_header">歌曲信息</string>
+    <string name="songlist_empty">未找到 songlist 文件</string>
+
+    <string name="manual_type">手动指定类型</string>
+</resources>

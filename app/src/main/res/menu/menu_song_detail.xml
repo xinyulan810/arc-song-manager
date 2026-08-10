@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_save"
+        android:title="保存"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_move"
+        android:title="移动曲包"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_rename"
+        android:title="重命名 id"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_delete"
+        android:title="删除歌曲"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_refresh"
+        android:title="刷新"
+        app:showAsAction="never" />
+</menu>
