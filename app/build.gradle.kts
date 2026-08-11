@@ -11,8 +11,8 @@ android {
         applicationId = "com.arcaea.songpack"
         minSdk = 26
         targetSdk = 34
-        versionCode = 57
-        versionName = "5.7"
+        versionCode = 58
+        versionName = "5.8"
         // 计时日志开关: gradle assembleDebug -Ptiming=true 时输出加载耗时日志(仅用于性能分析)
         val timing = (project.findProperty("timing") as? String) == "true"
         buildConfigField("boolean", "TIMING_LOGS", timing.toString())

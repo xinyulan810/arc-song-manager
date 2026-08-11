@@ -155,6 +155,20 @@
     <!-- Bottom navigation -->
     <string name="nav_import">Import</string>
     <string name="nav_manager">Manage</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="language">Language</string>
+    <string name="language_hint">Choose app display language</string>
+    <string name="lang_zh">简体中文</string>
+    <string name="lang_en">English</string>
+    <string name="about_title">About</string>
+    <string name="author">Author</string>
+    <string name="author_name">Xinyu</string>
+    <string name="github">GitHub</string>
+    <string name="version">Version</string>
+    <string name="open_github">Open GitHub repository</string>
 
     <!-- Status/recognition -->
     <string name="recognized">Recognized: %1$d files / %2$d songs</string>
