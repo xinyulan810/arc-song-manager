@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.arcaea.songpack.databinding.ItemBackupBinding
+import com.arcaea.songpack.R
 import com.arcaea.songpack.manager.BackupManager
 
 /** 备份快照列表适配器 */
@@ -32,13 +33,18 @@ class BackupAdapter(
     inner class VH(private val b: ItemBackupBinding) : RecyclerView.ViewHolder(b.root) {
         fun bind(snap: BackupManager.Snapshot) {
             b.backupTime.text = BackupManager.formatTime(snap.timestamp)
-            b.backupType.text = snap.typeLabel
-            b.backupLabel.text = snap.label.ifBlank { "备份" }
+            val typeRes = when (snap.type) {
+                BackupManager.SnapshotType.AUTO -> com.arcaea.songpack.R.string.snapshot_auto
+                BackupManager.SnapshotType.MANUAL -> com.arcaea.songpack.R.string.snapshot_manual
+                BackupManager.SnapshotType.BEFORE_RESTORE -> com.arcaea.songpack.R.string.snapshot_before_restore
+            }
+            b.backupType.text = b.root.context.getString(typeRes)
+            b.backupLabel.text = snap.label.ifBlank { b.root.context.getString(R.string.backup) }
             b.backupContent.text = buildString {
                 val parts = mutableListOf<String>()
                 if (snap.hasSonglist) parts.add("songlist")
                 if (snap.hasPacklist) parts.add("packlist")
-                append("包含: ").append(parts.joinToString(" + "))
+                append(b.root.context.getString(R.string.includes)).append(parts.joinToString(" + "))
             }
             b.root.setOnClickListener { onClick(snap) }
             b.root.setOnLongClickListener { onLongClick(snap); true }

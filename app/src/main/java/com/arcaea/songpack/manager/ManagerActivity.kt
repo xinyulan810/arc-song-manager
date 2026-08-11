@@ -56,7 +56,7 @@ class ManagerActivity : AppCompatActivity() {
     ) { uri ->
         uri?.let {
             GameRepository.persistGameDir(this, it)
-            Toast.makeText(this, "已选择游戏目录", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.dir_selected), Toast.LENGTH_SHORT).show()
             loadData()
         }
     }
@@ -183,7 +183,7 @@ class ManagerActivity : AppCompatActivity() {
                 TimingLog.mark("Manager.loadData", t0, "TOTAL")
                 binding.toolbar.subtitle = "共 ${allSongs.size} 首歌曲 / ${allPacks.size} 个曲包"
             } catch (e: Exception) {
-                Toast.makeText(this@ManagerActivity, "加载失败: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@ManagerActivity, getString(R.string.load_failed, e.message), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -212,15 +212,15 @@ class ManagerActivity : AppCompatActivity() {
 
     private fun promptSelectDir() {
         AlertDialog.Builder(this)
-            .setTitle("选择游戏目录")
-            .setMessage("请选择游戏资源根目录（包含 songs 和 img 文件夹的目录，即 Arc6 / OpnArc_ 所在目录）。选择后会自动保存。")
-            .setPositiveButton("去选择") { _, _ -> gameDirLauncher.launch(null) }
-            .setNegativeButton("稍后") { _, _ ->
-                binding.emptyView.text = "未加载游戏目录\n点击右上角菜单选择游戏资源根目录"
+            .setTitle(getString(R.string.select_game_dir_title))
+            .setMessage(getString(R.string.select_game_dir_msg))
+            .setPositiveButton(getString(R.string.go_select)) { _, _ -> gameDirLauncher.launch(null) }
+            .setNegativeButton(getString(R.string.later_short)) { _, _ ->
+                binding.emptyView.text = getString(R.string.no_game_dir)
                 binding.emptyView.visibility = View.VISIBLE
             }
             .setOnCancelListener {
-                binding.emptyView.text = "未加载游戏目录\n点击右上角菜单选择游戏资源根目录"
+                binding.emptyView.text = getString(R.string.no_game_dir)
                 binding.emptyView.visibility = View.VISIBLE
             }
             .show()
@@ -272,10 +272,10 @@ class ManagerActivity : AppCompatActivity() {
                     GameRepository.savePacklist(this@ManagerActivity, newPacks)
                 }
                 if (err == null) {
-                    Toast.makeText(this@ManagerActivity, "曲包 $id 已创建", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ManagerActivity, getString(R.string.pack_created, id), Toast.LENGTH_SHORT).show()
                     loadData()
                 } else {
-                    Toast.makeText(this@ManagerActivity, "创建失败: $err", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@ManagerActivity, getString(R.string.pack_create_failed, err), Toast.LENGTH_LONG).show()
                 }
             }
             null
@@ -323,10 +323,10 @@ class ManagerActivity : AppCompatActivity() {
                     else GameRepository.saveSonglist(this@ManagerActivity, allSongs)
                 }
                 if (err == null) {
-                    Toast.makeText(this@ManagerActivity, "已保存", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ManagerActivity, getString(R.string.saved), Toast.LENGTH_SHORT).show()
                     loadData()
                 } else {
-                    Toast.makeText(this@ManagerActivity, "保存失败: $err", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@ManagerActivity, getString(R.string.save_failed, err), Toast.LENGTH_LONG).show()
                     loadData()
                 }
             }
@@ -353,9 +353,9 @@ class ManagerActivity : AppCompatActivity() {
             "将删除曲包「${pack.displayName}」，其中 ${allSongs.count { it.set == pack.id }} 首歌的归属改为 base"
         }
         AlertDialog.Builder(this)
-            .setTitle("确认删除")
+            .setTitle(getString(R.string.confirm_delete))
             .setMessage(msg)
-            .setPositiveButton("确认") { _, _ ->
+            .setPositiveButton(getString(R.string.confirm)) { _, _ ->
                 lifecycleScope.launch {
                     val err = withContext(Dispatchers.IO) {
                         val remainingPacks = allPacks.filter { it.id != pack.id }
@@ -379,7 +379,7 @@ class ManagerActivity : AppCompatActivity() {
                     loadData()
                 }
             }
-            .setNegativeButton("取消") { _, _ -> }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .show()
     }
 
@@ -389,9 +389,9 @@ class ManagerActivity : AppCompatActivity() {
                 GameRepository.importPackImage(this@ManagerActivity, packId, uri)
             }
             if (err == null) {
-                Toast.makeText(this@ManagerActivity, "封面已导入", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ManagerActivity, getString(R.string.cover_imported), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this@ManagerActivity, "导入失败: $err", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@ManagerActivity, getString(R.string.cover_import_failed, err), Toast.LENGTH_LONG).show()
             }
             loadData()
         }
@@ -403,13 +403,13 @@ class ManagerActivity : AppCompatActivity() {
         val dir = GameRepository.gameSongsDir(this)
         val hasBackup = dir?.findFile("packlist.backup") != null
         if (!hasBackup) {
-            Toast.makeText(this, "未找到 packlist.backup 备份文件", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.no_packlist_backup), Toast.LENGTH_SHORT).show()
             return
         }
         AlertDialog.Builder(this)
-            .setTitle("恢复 packlist")
-            .setMessage("将从 packlist.backup 恢复曲包列表（覆盖当前 packlist）。")
-            .setPositiveButton("恢复") { _, _ ->
+            .setTitle(getString(R.string.restore_packlist))
+            .setMessage(getString(R.string.restore_packlist_msg))
+            .setPositiveButton(getString(R.string.restore)) { _, _ ->
                 lifecycleScope.launch {
                     val err = withContext(Dispatchers.IO) {
                         val root = GameRepository.gameSongsDir(this@ManagerActivity)
@@ -429,7 +429,7 @@ class ManagerActivity : AppCompatActivity() {
                     loadData()
                 }
             }
-            .setNegativeButton("取消") { _, _ -> }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .show()
     }
 

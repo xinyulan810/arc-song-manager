@@ -11,8 +11,8 @@ android {
         applicationId = "com.arcaea.songpack"
         minSdk = 26
         targetSdk = 34
-        versionCode = 55
-        versionName = "5.5"
+        versionCode = 57
+        versionName = "5.7"
         // 计时日志开关: gradle assembleDebug -Ptiming=true 时输出加载耗时日志(仅用于性能分析)
         val timing = (project.findProperty("timing") as? String) == "true"
         buildConfigField("boolean", "TIMING_LOGS", timing.toString())
@@ -22,6 +22,8 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // 正式版用 debug keystore 签名(与历史版本一致, 便于覆盖安装)
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 

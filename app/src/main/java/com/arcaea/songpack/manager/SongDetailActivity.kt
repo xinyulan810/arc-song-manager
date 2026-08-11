@@ -88,7 +88,7 @@ class SongDetailActivity : AppCompatActivity() {
             packs = GameRepository.buildPackList(this@SongDetailActivity, p, songs)
             entry = allSongs.firstOrNull { it.id == songId }
             if (entry == null) {
-                Toast.makeText(this@SongDetailActivity, "未在 songlist 中找到歌曲 $songId", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@SongDetailActivity, getString(R.string.song_not_found, songId), Toast.LENGTH_LONG).show()
                 finish()
                 return@launch
             }
@@ -268,10 +268,10 @@ class SongDetailActivity : AppCompatActivity() {
                 GameRepository.saveSonglist(this@SongDetailActivity, allSongs)
             }
             if (err == null) {
-                Toast.makeText(this@SongDetailActivity, "已保存", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SongDetailActivity, getString(R.string.saved), Toast.LENGTH_SHORT).show()
                 // 若 set 变了, 更新 songId 显示(仍在原包, 无需离开)
             } else {
-                Toast.makeText(this@SongDetailActivity, "保存失败: $err", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@SongDetailActivity, getString(R.string.save_failed, err), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -283,18 +283,18 @@ class SongDetailActivity : AppCompatActivity() {
         val names = packs.map { "${it.displayName}  (${it.id})${if (it.id == e.set) "  ←当前" else ""}" }
         val currentIdx = packs.indexOfFirst { it.id == e.set }
         AlertDialog.Builder(this)
-            .setTitle("移动歌曲到曲包")
+            .setTitle(getString(R.string.move_song))
             .setSingleChoiceItems(names.toTypedArray(), if (currentIdx >= 0) currentIdx else 0) { _, _ -> }
-            .setPositiveButton("移动") { dialog, _ ->
+            .setPositiveButton(getString(R.string.move)) { dialog, _ ->
                 val idx = (dialog as AlertDialog).listView.checkedItemPosition
                 if (idx in packs.indices) {
                     val target = packs[idx]
                     e.raw.put("set", target.id)
                     save()
-                    Toast.makeText(this, "已移动到「${target.displayName}」", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.moved_to, target.displayName), Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("取消") { _, _ -> }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .show()
     }
 
@@ -307,14 +307,14 @@ class SongDetailActivity : AppCompatActivity() {
             addView(UiUtil.labelOf(this@SongDetailActivity, "歌曲 id（也是文件夹名，修改将重命名文件夹）", et))
         }
         AlertDialog.Builder(this)
-            .setTitle("重命名歌曲 id")
+            .setTitle(getString(R.string.rename_song_id))
             .setView(container)
-            .setPositiveButton("确定") { _, _ ->
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
                 val newId = et.text.toString().trim()
-                if (newId.isBlank()) { Toast.makeText(this, "id 不能为空", Toast.LENGTH_SHORT).show(); return@setPositiveButton }
+                if (newId.isBlank()) { Toast.makeText(this, getString(R.string.id_empty), Toast.LENGTH_SHORT).show(); return@setPositiveButton }
                 if (newId == e.id) return@setPositiveButton
                 if (allSongs.any { it.id == newId }) {
-                    Toast.makeText(this, "已存在同名歌曲: $newId", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.id_duplicate, newId), Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
                 lifecycleScope.launch {
@@ -323,24 +323,24 @@ class SongDetailActivity : AppCompatActivity() {
                         if (re == null) GameRepository.saveSonglist(this@SongDetailActivity, allSongs) else re
                     }
                     if (err == null) {
-                        Toast.makeText(this@SongDetailActivity, "已重命名为 $newId", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@SongDetailActivity, getString(R.string.renamed_to, newId), Toast.LENGTH_SHORT).show()
                         songId = newId
                         loadData()
                     } else {
-                        Toast.makeText(this@SongDetailActivity, "重命名失败: $err", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@SongDetailActivity, getString(R.string.rename_failed, err), Toast.LENGTH_LONG).show()
                     }
                 }
             }
-            .setNegativeButton("取消") { _, _ -> }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .show()
     }
 
     private fun confirmDelete() {
         val e = entry ?: return
         AlertDialog.Builder(this)
-            .setTitle("删除歌曲「${e.displayTitle.ifBlank { e.id }}」")
-            .setMessage("将从 songlist 移除该条目，并删除歌曲文件夹 songs/${e.id}/（不可恢复）。")
-            .setPositiveButton("确认删除") { _, _ ->
+            .setTitle(getString(R.string.delete_song_title, e.displayTitle.ifBlank { e.id }))
+            .setMessage(getString(R.string.delete_song_msg, e.id))
+            .setPositiveButton(getString(R.string.confirm_delete_song)) { _, _ ->
                 lifecycleScope.launch {
                     val err = withContext(Dispatchers.IO) {
                         val list = allSongs.toMutableList()
@@ -348,14 +348,14 @@ class SongDetailActivity : AppCompatActivity() {
                         if (de == null) GameRepository.saveSonglist(this@SongDetailActivity, list) else de
                     }
                     if (err == null) {
-                        Toast.makeText(this@SongDetailActivity, "已删除", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@SongDetailActivity, getString(R.string.deleted), Toast.LENGTH_SHORT).show()
                         finish()
                     } else {
-                        Toast.makeText(this@SongDetailActivity, "删除失败: $err", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@SongDetailActivity, getString(R.string.delete_failed, err), Toast.LENGTH_LONG).show()
                     }
                 }
             }
-            .setNegativeButton("取消") { _, _ -> }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .show()
     }
 

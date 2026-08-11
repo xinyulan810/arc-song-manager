@@ -1,7 +1,9 @@
 package com.arcaea.songpack.ui
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.arcaea.songpack.R
@@ -23,6 +25,11 @@ class ClassifiedFileAdapter(
 
     /** bg背景 的标准分辨率提示 */
     private val bgLabelWithHint = "bg背景(标准1920x1440)"
+    /** 窄屏时 bg 类型用短标签, 避免挤占文件名列 */
+    private val bgLabelShort = "bg背景"
+
+    /** 是否为窄屏(<600dp): 窄屏压缩类型/大小列, 让文件名列显示更多 */
+    private var isNarrow: Boolean = false
 
     class VH(val binding: ItemClassifiedFileBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -30,6 +37,30 @@ class ClassifiedFileAdapter(
         val binding = ItemClassifiedFileBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
+        val widthDp = parent.context.resources.configuration.screenWidthDp
+        isNarrow = widthDp < 600
+        if (isNarrow) {
+            val density = parent.context.resources.displayMetrics.density
+            // 窄屏: 省略文件大小列; 布局 = 第一列占满剩余空间左对齐, 第二列(类型)固定宽右对齐, 第三列(修改)靠右
+            binding.fileSize.visibility = View.GONE
+
+            // 第一列: 占满剩余空间, 文本左对齐
+            val nameParams = binding.fileName.layoutParams as LinearLayout.LayoutParams
+            nameParams.width = 0
+            nameParams.weight = 1f
+            binding.fileName.layoutParams = nameParams
+
+            // 第二列: 固定宽度足够容纳类型文本, 文本右对齐(右边缘贴近修改按钮), 右侧留2空格
+            val typeParams = binding.typeText.layoutParams as LinearLayout.LayoutParams
+            typeParams.width = (110 * density).toInt()
+            typeParams.rightMargin = (12 * density).toInt()
+            binding.typeText.layoutParams = typeParams
+            binding.typeText.gravity = android.view.Gravity.END
+            binding.typeText.setEllipsize(android.text.TextUtils.TruncateAt.END)
+
+            // 第三列: 修改按钮, 内边距缩小
+            binding.btnModify.setPadding((4 * density).toInt(), (2 * density).toInt(), (4 * density).toInt(), (2 * density).toInt())
+        }
         return VH(binding)
     }
 
@@ -39,11 +70,12 @@ class ClassifiedFileAdapter(
         val item = items[position]
         val binding = holder.binding
 
-        // 图片文件在文件名后附上分辨率, 如 "infb.jpg (1920x1440)"
+        // 只显示文件名(去掉文件夹前缀), 图片文件在文件名后附上分辨率, 如 "infb.jpg (1920x1440)"
+        val name = item.relativePath.substringAfterLast('/').substringAfterLast('\\')
         binding.fileName.text = if (item.resolution != null) {
-            "${item.relativePath} (${item.resolution})"
+            "$name (${item.resolution})"
         } else {
-            item.relativePath
+            name
         }
         binding.fileSize.text = UriUtil.humanReadableSize(item.size)
 
@@ -58,7 +90,7 @@ class ClassifiedFileAdapter(
 
     private fun typeLabel(type: FileType): String {
         return if (type == FileType.BACKGROUND) {
-            bgLabelWithHint
+            if (isNarrow) bgLabelShort else bgLabelWithHint
         } else {
             typeLabels.getOrElse(type.ordinal) { type.name }
         }
@@ -67,7 +99,7 @@ class ClassifiedFileAdapter(
     private fun showTypeDialog(holder: VH, item: ClassifiedFile, position: Int) {
         val context = holder.binding.root.context
         AlertDialog.Builder(context)
-            .setTitle("选择文件类型")
+            .setTitle(context.getString(R.string.select_file_type))
             .setItems(typeLabels) { _, which ->
                 val newType = FileType.entries[which]
                 if (item.type != newType) {
@@ -76,7 +108,7 @@ class ClassifiedFileAdapter(
                     onTypeChanged(position, newType)
                 }
             }
-            .setNegativeButton("取消", null)
+            .setNegativeButton(context.getString(R.string.cancel), null)
             .show()
     }
 }

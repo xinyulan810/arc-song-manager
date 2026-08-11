@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/purple_700"
-        app:title="曲包管理"
+        app:title="@string/pack_manager"
         app:titleTextColor="@color/white"
         app:subtitleTextColor="@color/white" />
 
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        android:hint="搜索歌曲（标题 / 艺术家 / id / 曲包）">
+        android:hint="@string/search_hint">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/searchInput"
@@ -51,7 +51,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:padding="32dp"
-            android:text="未加载游戏目录\n请点击右上角选择游戏资源根目录"
+            android:text="@string/no_game_dir_btn"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:visibility="gone" />
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="20dp"
-            android:contentDescription="新建曲包"
+            android:contentDescription="@string/fab_new_pack"
             android:src="@android:drawable/ic_menu_add"
             app:backgroundTint="@color/purple_500" />
     </FrameLayout>

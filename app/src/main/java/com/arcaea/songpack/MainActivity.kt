@@ -117,10 +117,10 @@ class MainActivity : AppCompatActivity() {
         binding.root.post {
             if (gameRootUri == null) {
                 AlertDialog.Builder(this)
-                    .setTitle("选择游戏目录")
-                    .setMessage("首次使用, 请选择游戏资源根目录(包含 songs 和 img 文件夹的目录)。选择后会自动保存。")
-                    .setPositiveButton("去选择") { _, _ -> gameDirLauncher.launch(null) }
-                    .setNegativeButton("稍后再说") { _, _ -> }
+                    .setTitle(getString(R.string.select_game_dir_title))
+                    .setMessage(getString(R.string.first_use_msg))
+                    .setPositiveButton(getString(R.string.go_select)) { _, _ -> gameDirLauncher.launch(null) }
+                    .setNegativeButton(getString(R.string.later)) { _, _ -> }
                     .setOnCancelListener { }
                     .show()
             }
@@ -190,7 +190,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadArchive(uri: Uri) {
         lifecycleScope.launch {
-            status("正在读取压缩包…")
+            status(getString(R.string.reading_archive))
             appendLog("正在读取压缩包…")
             try {
                 val archiveFile = withContext(Dispatchers.IO) {
@@ -210,10 +210,10 @@ class MainActivity : AppCompatActivity() {
 
                 // 解析 songlist 片段(自动或手动指定后都会走这里)
                 refreshSonglist()
-                status("识别完成: ${classifiedFiles.size} 个文件 / ${entries.size} 首歌曲")
+                status(getString(R.string.recognized, classifiedFiles.size, entries.size))
                 appendLog("压缩包解析完成, 找到 ${classifiedFiles.size} 个文件")
             } catch (e: Exception) {
-                status("解析失败: ${e.message}")
+                status(getString(R.string.parse_failed, e.message))
                 appendLog("错误: ${e.message}")
             }
         }
@@ -243,10 +243,10 @@ class MainActivity : AppCompatActivity() {
         // 校验 songlist 是否健康(异常则阻止导入)
         songlistCheck = SonglistParser.validateEntries(entries)
         if (songlistCheck != null && !songlistCheck!!.valid) {
-            status("⚠ songlist 异常: ${songlistCheck!!.issues.joinToString("; ")}")
+            status(getString(R.string.songlist_error, songlistCheck!!.issues.joinToString("; ")))
             appendLog("⚠ songlist 异常, 请修改源 songlist 文件后重新加载")
         } else {
-            status("识别完成: ${classifiedFiles.size} 个文件 / ${entries.size} 首歌曲")
+            status(getString(R.string.recognized, classifiedFiles.size, entries.size))
         }
         updateUi()
     }
@@ -255,16 +255,16 @@ class MainActivity : AppCompatActivity() {
 
     /** 可编辑的歌曲字段: (json键, 界面标签) */
     private val editableFields = listOf(
-        "id" to "歌曲 ID",
-        "title_en" to "标题 (en)",
-        "artist" to "艺术家",
-        "bpm" to "BPM",
-        "set" to "所属包",
-        "side" to "Side (0/1)",
-        "bg" to "背景图名",
-        "audio" to "音乐文件名",
-        "jacket" to "封面文件名",
-        "version" to "版本"
+        "id" to { getString(R.string.field_id) },
+        "title_en" to { getString(R.string.field_title_en) },
+        "artist" to { getString(R.string.field_artist) },
+        "bpm" to { getString(R.string.field_bpm) },
+        "set" to { getString(R.string.field_set) },
+        "side" to { getString(R.string.field_side) },
+        "bg" to { getString(R.string.field_bg) },
+        "audio" to { getString(R.string.field_audio) },
+        "jacket" to { getString(R.string.field_jacket) },
+        "version" to { getString(R.string.field_version) }
     )
 
     /**
@@ -273,7 +273,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun showSongEditor() {
         if (entries.isEmpty()) {
-            toast("没有歌曲信息可编辑(请先识别 songlist)")
+            toast(getString(R.string.no_song_info))
             return
         }
         val working = entries.toMutableList()
@@ -290,16 +290,17 @@ class MainActivity : AppCompatActivity() {
         ).apply {
             setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
-        container.addView(labelOf("选择歌曲", spinner))
+        container.addView(labelOf(getString(R.string.select_song), spinner))
 
         // 字段输入框
         val editMap = mutableMapOf<String, EditText>()
         for ((key, label) in editableFields) {
+            val lbl = label()
             val et = EditText(this).apply {
-                hint = label
+                hint = lbl
                 setSingleLine(true)
             }
-            container.addView(labelOf(label, et))
+            container.addView(labelOf(lbl, et))
             editMap[key] = et
         }
         loadFields(working.first(), editMap)
@@ -315,9 +316,9 @@ class MainActivity : AppCompatActivity() {
         val scroll = ScrollView(this).apply { addView(container) }
 
         AlertDialog.Builder(this)
-            .setTitle("编辑歌曲信息")
+            .setTitle(getString(R.string.edit_song_info))
             .setView(scroll)
-            .setPositiveButton("保存") { _, _ ->
+            .setPositiveButton(getString(R.string.save)) { _, _ ->
                 val pos = spinner.selectedItemPosition
                 val entry = working[pos]
                 for ((key, et) in editMap) {
@@ -330,7 +331,7 @@ class MainActivity : AppCompatActivity() {
                 updateUi()
                 appendLog("歌曲 ${entry.raw.optString("id")} 信息已更新(bg=${entry.raw.optString("bg")})")
             }
-            .setNegativeButton("取消") { _, _ -> }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .show()
     }
 
@@ -357,7 +358,7 @@ class MainActivity : AppCompatActivity() {
     private fun showRawSonglistEditor() {
         val songlistFile = classifiedFiles.firstOrNull { it.type == FileType.SONGLIST }?.file
         if (songlistFile == null) {
-            toast("未找到标记为 songlist 的文件")
+            toast(getString(R.string.no_songlist_file))
             return
         }
         val originalText = songlistFile.readText()
@@ -376,20 +377,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         AlertDialog.Builder(this)
-            .setTitle("编辑源 songlist(直接改文本)")
+            .setTitle(getString(R.string.edit_raw_songlist))
             .setView(et)
-            .setPositiveButton("保存并解析") { _, _ ->
+            .setPositiveButton(getString(R.string.save_and_parse)) { _, _ ->
                 val newText = et.text.toString()
                 try {
                     songlistFile.writeText(newText)
                     appendLog("已保存源 songlist 修改")
                     refreshSonglist()
-                    toast("已保存并重新解析")
+                    toast(getString(R.string.saved_and_reparsed))
                 } catch (e: Exception) {
-                    toast("保存失败: ${e.message}")
+                    toast(getString(R.string.save_failed, e.message))
                 }
             }
-            .setNegativeButton("取消") { _, _ -> }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .show()
     }
 
@@ -435,11 +436,11 @@ class MainActivity : AppCompatActivity() {
     private fun doImport() {
         val rootUri = gameRootUri
         if (rootUri == null) {
-            toast("请先选择游戏目录")
+            toast(getString(R.string.select_game_dir_first))
             return
         }
         if (entries.isEmpty()) {
-            toast("没有解析到 songlist 条目, 无法导入")
+            toast(getString(R.string.no_songlist_to_import))
             return
         }
         val ids = entries.map { it.id }
@@ -463,7 +464,7 @@ class MainActivity : AppCompatActivity() {
                 SongImporter.prepareImport(this@MainActivity, rootUri, entries, bgFile)
             }
             if (prepared == null) {
-                toast("无法读取游戏目录或 songs 目录")
+                toast(getString(R.string.cannot_access_dir))
                 binding.btnImport.isEnabled = true
                 return@launch
             }
@@ -478,7 +479,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             // 4. 执行导入(备份 + 复制 + 写入)
-            status("正在导入…")
+            status(getString(R.string.importing))
             appendLog("开始导入…")
             val result = withContext(Dispatchers.IO) {
                 SongImporter.executeImport(
@@ -487,7 +488,7 @@ class MainActivity : AppCompatActivity() {
             }
             status(if (result.success) "导入成功" else "导入失败")
             appendLog(result.message)
-            if (result.success) toast("导入成功: ${result.importedIds.size} 首歌曲")
+            if (result.success) toast(getString(R.string.import_success_toast, result.importedIds.size))
             binding.btnImport.isEnabled = true
         }
     }
@@ -540,10 +541,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             AlertDialog.Builder(this)
-                .setTitle("确认导入")
+                .setTitle(getString(R.string.confirm_import))
                 .setView(scroll)
-                .setPositiveButton("确认导入") { _, _ -> cont.resume(true) }
-                .setNegativeButton("返回修改") { _, _ -> cont.resume(false) }
+                .setPositiveButton(getString(R.string.confirm_import)) { _, _ -> cont.resume(true) }
+                .setNegativeButton(getString(R.string.back_to_edit)) { _, _ -> cont.resume(false) }
                 .setOnCancelListener { cont.resume(false) }
                 .show()
         }
@@ -553,10 +554,10 @@ class MainActivity : AppCompatActivity() {
         suspendCancellableCoroutine { cont ->
             runOnUiThread {
                 AlertDialog.Builder(this)
-                    .setTitle("检测到重复歌曲")
-                    .setMessage("以下歌曲已存在于游戏 songlist 中:\n\n${existing.joinToString("\n")}\n\n是否替换旧条目?")
-                    .setPositiveButton("替换") { _, _ -> cont.resume(true) }
-                    .setNegativeButton("取消") { _, _ -> cont.resume(false) }
+                    .setTitle(getString(R.string.duplicate_songs))
+                    .setMessage(getString(R.string.duplicate_msg, existing.joinToString("\n")))
+                    .setPositiveButton(getString(R.string.replace)) { _, _ -> cont.resume(true) }
+                    .setNegativeButton(getString(R.string.cancel)) { _, _ -> cont.resume(false) }
                     .setOnCancelListener { cont.resume(false) }
                     .show()
             }
@@ -568,7 +569,7 @@ class MainActivity : AppCompatActivity() {
     private fun restoreFromBackup() {
         val rootUri = gameRootUri
         if (rootUri == null) {
-            toast("请先选择游戏目录")
+            toast(getString(R.string.select_game_dir_first))
             return
         }
         lifecycleScope.launch {
@@ -578,7 +579,7 @@ class MainActivity : AppCompatActivity() {
                 root?.findFile("songs")?.findFile("songlist.backup") != null
             }
             if (!backupExists) {
-                toast("未找到 songlist.backup 备份文件")
+                toast(getString(R.string.no_songlist_backup_file))
                 return@launch
             }
             // 计算恢复后将被移除的歌曲
@@ -588,7 +589,7 @@ class MainActivity : AppCompatActivity() {
             val confirmed = confirmRestore(willRemove)
             if (!confirmed) return@launch
 
-            status("正在恢复…")
+            status(getString(R.string.restoring))
             appendLog("开始恢复 songlist…")
             val result = withContext(Dispatchers.IO) {
                 SongImporter.restoreFromBackup(this@MainActivity, rootUri)
@@ -616,10 +617,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 AlertDialog.Builder(this)
-                    .setTitle("恢复备份")
+                    .setTitle(getString(R.string.restore_backup_title))
                     .setMessage(msg)
-                    .setPositiveButton("恢复") { _, _ -> cont.resume(true) }
-                    .setNegativeButton("取消") { _, _ -> cont.resume(false) }
+                    .setPositiveButton(getString(R.string.restore)) { _, _ -> cont.resume(true) }
+                    .setNegativeButton(getString(R.string.cancel)) { _, _ -> cont.resume(false) }
                     .setOnCancelListener { cont.resume(false) }
                     .show()
             }

@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import com.arcaea.songpack.databinding.ItemPackBinding
+import com.arcaea.songpack.R
 import com.arcaea.songpack.manager.GameRepository
 import com.arcaea.songpack.manager.model.Pack
 
@@ -42,7 +43,7 @@ class PackAdapter(
                 if (pack.section.isNotBlank()) append(pack.section)
                 val rawSections = pack.raw.optString("_sections", "")
                 if (rawSections.isNotBlank()) append(" · $rawSections")
-                append(" · ${item.songCount} 首")
+                append(" · ${b.root.context.getString(R.string.song_count, item.songCount)}")
             }
             b.packImage.setImageDrawable(null)
             b.packInitial.visibility = android.view.View.GONE

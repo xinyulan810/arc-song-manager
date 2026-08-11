@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.arcaea.songpack.R
 import com.arcaea.songpack.databinding.ActivityBackupBinding
 import com.arcaea.songpack.manager.ui.BackupAdapter
 import kotlinx.coroutines.Dispatchers
@@ -69,10 +70,10 @@ class BackupActivity : AppCompatActivity() {
                 BackupManager.snapshot(this@BackupActivity, BackupManager.SnapshotType.MANUAL, "手动备份")
             }
             if (err == null) {
-                Toast.makeText(this@BackupActivity, "已创建手动备份", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@BackupActivity, getString(R.string.manual_backup_created), Toast.LENGTH_SHORT).show()
                 refresh()
             } else {
-                Toast.makeText(this@BackupActivity, "备份失败: $err", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@BackupActivity, getString(R.string.backup_failed, err), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -84,16 +85,12 @@ class BackupActivity : AppCompatActivity() {
             if (snap.hasPacklist) append("packlist")
         }
         AlertDialog.Builder(this)
-            .setTitle("恢复快照 $time")
-            .setMessage(
-                "将用该快照覆盖当前 ${content.trim()}\n\n" +
-                    "恢复前会自动备份当前状态，可随时再还原。\n" +
-                    "恢复后需返回上层刷新查看。"
-            )
-            .setPositiveButton("恢复") { _, _ ->
+            .setTitle(getString(R.string.restore_snapshot, time))
+            .setMessage(getString(R.string.restore_snapshot_msg, content.trim()))
+            .setPositiveButton(getString(R.string.restore)) { _, _ ->
                 doRestore(snap)
             }
-            .setNegativeButton("取消") { _, _ -> }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .show()
     }
 
@@ -105,21 +102,21 @@ class BackupActivity : AppCompatActivity() {
             if (err == null) {
                 Toast.makeText(
                     this@BackupActivity,
-                    "已恢复到 ${BackupManager.formatTime(snap.timestamp)}",
+                    getString(R.string.restored_to, BackupManager.formatTime(snap.timestamp)),
                     Toast.LENGTH_LONG
                 ).show()
                 refresh()
             } else {
-                Toast.makeText(this@BackupActivity, "恢复失败: $err", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@BackupActivity, getString(R.string.restore_failed, err), Toast.LENGTH_LONG).show()
             }
         }
     }
 
     private fun confirmDelete(snap: BackupManager.Snapshot) {
         AlertDialog.Builder(this)
-            .setTitle("删除快照")
-            .setMessage("确定删除 ${BackupManager.formatTime(snap.timestamp)} 的快照？")
-            .setPositiveButton("删除") { _, _ ->
+            .setTitle(getString(R.string.delete_snapshot))
+            .setMessage(getString(R.string.delete_snapshot_msg, BackupManager.formatTime(snap.timestamp)))
+            .setPositiveButton(getString(R.string.delete)) { _, _ ->
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         BackupManager.delete(this@BackupActivity, snap)
@@ -127,7 +124,7 @@ class BackupActivity : AppCompatActivity() {
                     refresh()
                 }
             }
-            .setNegativeButton("取消") { _, _ -> }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .show()
     }
 }

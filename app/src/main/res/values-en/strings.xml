@@ -1,0 +1,178 @@
+<resources>
+    <!-- App name -->
+    <string name="app_name">Arc Custom Song Manager</string>
+
+    <!-- Import page -->
+    <string name="import_subtitle">Arcaea custom chart import helper</string>
+    <string name="status_current">Status</string>
+    <string name="files_recognized">Recognized files</string>
+    <string name="btn_edit_songs">Edit songs</string>
+    <string name="btn_edit_raw">Edit source file</string>
+    <string name="btn_restore_backup">Restore backup</string>
+    <string name="log_header">Log</string>
+
+    <string name="select_archive">Select zip/rar archive</string>
+    <string name="select_game_dir">Select/Change game folder</string>
+    <string name="import_songs">Start import</string>
+    <string name="importing">Importing…</string>
+    <string name="rescan">Re-scan</string>
+    <string name="status_no_archive">No archive selected</string>
+
+    <!-- File types -->
+    <string name="file_type_aff">Chart (.aff)</string>
+    <string name="file_type_jacket">Song cover</string>
+    <string name="file_type_jacket_thumb">Cover_256</string>
+    <string name="file_type_bg">Background</string>
+    <string name="file_type_audio">Music (.ogg)</string>
+    <string name="file_type_songlist">songlist entry</string>
+    <string name="file_type_unknown">Unknown</string>
+    <string name="file_type_ignore">Ignore</string>
+    <string name="bg_label_with_hint">Background (1920x1440)</string>
+
+    <string name="songlist_header">Song info</string>
+    <string name="songlist_empty">No songlist file found</string>
+
+    <string name="manual_type">Set type manually</string>
+    <string name="select_file_type">Select file type</string>
+    <string name="btn_modify">Edit</string>
+
+    <!-- Common buttons/dialogs -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">OK</string>
+    <string name="restore">Restore</string>
+    <string name="delete">Delete</string>
+    <string name="ok">OK</string>
+    <string name="done">Done</string>
+    <string name="edit">Edit</string>
+    <string name="refresh">Refresh</string>
+
+    <!-- Game folder selection -->
+    <string name="select_game_dir_title">Select game folder</string>
+    <string name="first_use_msg">First use: please select the game resource root folder (the folder containing the songs and img directories). It will be saved automatically.</string>
+    <string name="select_game_dir_msg">Please select the game resource root folder (containing the songs and img directories, i.e. the Arc6 / OpnArc_ folder). It will be saved automatically.</string>
+    <string name="go_select">Select</string>
+    <string name="later">Later</string>
+    <string name="later_short">Later</string>
+    <string name="dir_selected">Game folder selected</string>
+    <string name="no_game_dir">No game folder loaded\nUse the menu in the top-right to select the game resource root</string>
+    <string name="no_game_dir_btn">No game folder loaded\nTap the top-right button to select the game resource root</string>
+
+    <!-- Pack manager -->
+    <string name="pack_manager">Song packs</string>
+    <string name="search_hint">Search songs (title / artist / id / pack)</string>
+    <string name="search_pack_hint">Search songs in this pack</string>
+    <string name="fab_new_pack">New pack</string>
+    <string name="pack_created">Pack %1$s created</string>
+    <string name="pack_create_failed">Create failed: %1$s</string>
+    <string name="saved">Saved</string>
+    <string name="save_failed">Save failed: %1$s</string>
+    <string name="confirm_delete">Confirm delete</string>
+    <string name="cover_imported">Cover imported</string>
+    <string name="cover_import_failed">Import failed: %1$s</string>
+    <string name="no_packlist_backup">No packlist.backup backup file found</string>
+    <string name="restore_packlist">Restore packlist</string>
+    <string name="restore_packlist_msg">This will restore the pack list from packlist.backup (overwriting the current packlist).</string>
+    <string name="restore_packlist_old">Restore packlist.backup (legacy)</string>
+
+    <!-- Songs in pack -->
+    <string name="pack_songs">Pack songs</string>
+    <string name="sort">Sort</string>
+    <string name="sort_default">Default</string>
+    <string name="sort_by_time">By modified time</string>
+    <string name="pack_empty">This pack has no songs</string>
+    <string name="edit_hint">Long-press a song and drag it to a pack on the left; drag within the pack to reorder</string>
+    <string name="moving">Moving…</string>
+    <string name="moving_name">Moving “%1$s”…</string>
+    <string name="song_count">%1$d songs</string>
+    <string name="load_failed">Load failed: %1$s</string>
+
+    <!-- Song detail -->
+    <string name="song_detail">Song detail</string>
+    <string name="song_cover">Song cover</string>
+    <string name="pack_cover">Pack cover</string>
+    <string name="song_not_found">Song %1$s not found in songlist</string>
+    <string name="edit_song_info">Edit song info</string>
+    <string name="edit_raw_songlist">Edit raw songlist (directly edit text)</string>
+    <string name="save_and_parse">Save &amp; parse</string>
+    <string name="no_song_info">No song info to edit (please recognize a songlist first)</string>
+    <string name="select_song">Select song</string>
+    <string name="no_diff">No difficulty</string>
+    <string name="includes">Contains: </string>
+    <string name="confirm_import">Confirm import</string>
+    <string name="back_to_edit">Back to edit</string>
+    <string name="duplicate_songs">Duplicate songs detected</string>
+    <string name="duplicate_msg">The following songs already exist in the game songlist:\n\n%1$s\n\nReplace old entries?</string>
+    <string name="replace">Replace</string>
+    <string name="restore_backup_title">Restore backup</string>
+    <string name="move_song">Move song to pack</string>
+    <string name="move">Move</string>
+    <string name="moved_to">Moved to “%1$s”</string>
+    <string name="rename_song_id">Rename song id</string>
+    <string name="id_empty">id cannot be empty</string>
+    <string name="id_duplicate">A song with this id already exists: %1$s</string>
+    <string name="renamed_to">Renamed to %1$s</string>
+    <string name="rename_failed">Rename failed: %1$s</string>
+    <string name="delete_song_title">Delete song “%1$s”</string>
+    <string name="delete_song_msg">This removes the entry from songlist and deletes the song folder songs/%1$s/ (cannot be undone).</string>
+    <string name="confirm_delete_song">Delete</string>
+    <string name="deleted">Deleted</string>
+    <string name="delete_failed">Delete failed: %1$s</string>
+    <string name="move_pack">Move to pack</string>
+    <string name="rename_id">Rename id</string>
+    <string name="delete_song">Delete song</string>
+
+    <!-- Song field labels -->
+    <string name="field_id">Song ID</string>
+    <string name="field_title_en">Title (en)</string>
+    <string name="field_artist">Artist</string>
+    <string name="field_bpm">BPM</string>
+    <string name="field_set">Pack</string>
+    <string name="field_side">Side (0/1)</string>
+    <string name="field_bg">Background name</string>
+    <string name="field_audio">Music file name</string>
+    <string name="field_jacket">Cover file name</string>
+    <string name="field_version">Version</string>
+
+    <!-- Backup & restore -->
+    <string name="backup_restore">Backup &amp; restore</string>
+    <string name="backup_hint">A backup is created automatically before every songlist/packlist change. Tap a snapshot to restore, long-press to delete.</string>
+    <string name="backup_empty">No backup snapshots\nA snapshot is created automatically after any saved change</string>
+    <string name="fab_manual_backup">Manual backup</string>
+    <string name="manual_backup_created">Manual backup created</string>
+    <string name="backup_failed">Backup failed: %1$s</string>
+    <string name="restore_snapshot">Restore snapshot %1$s</string>
+    <string name="restore_snapshot_msg">This snapshot will overwrite the current %1$s\n\nThe current state is backed up automatically before restoring, so you can always restore again.\nGo back and refresh to see the changes.</string>
+    <string name="restored_to">Restored to %1$s</string>
+    <string name="delete_snapshot">Delete snapshot</string>
+    <string name="delete_snapshot_msg">Delete the snapshot from %1$s?</string>
+    <string name="restore_failed">Restore failed: %1$s</string>
+    <string name="snapshot_auto">Auto</string>
+    <string name="snapshot_manual">Manual</string>
+    <string name="snapshot_before_restore">Pre-restore</string>
+    <string name="backup">Backup</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_import">Import</string>
+    <string name="nav_manager">Manage</string>
+
+    <!-- Status/recognition -->
+    <string name="recognized">Recognized: %1$d files / %2$d songs</string>
+    <string name="songlist_error">⚠ songlist issue: %1$s</string>
+    <string name="songlist_parse_failed">songlist parse failed: %1$s</string>
+    <string name="no_songlist_file">No file marked as songlist found</string>
+    <string name="reading_archive">Reading archive…</string>
+    <string name="parse_failed">Parse failed: %1$s</string>
+    <string name="import_success_status">Import successful</string>
+    <string name="import_failed_status">Import failed</string>
+    <string name="import_success_toast">Imported %1$d songs</string>
+    <string name="select_game_dir_first">Please select the game folder first</string>
+    <string name="no_songlist_to_import">No songlist entries parsed, cannot import</string>
+    <string name="cannot_access_dir">Cannot access the game folder or songs directory</string>
+    <string name="no_songlist_backup_file">No songlist.backup backup file found</string>
+    <string name="restoring">Restoring…</string>
+    <string name="restore_success_status">Restore successful</string>
+    <string name="restore_failed_status">Restore failed</string>
+    <string name="restored_from_backup">songlist restored from backup</string>
+    <string name="saved_and_reparsed">Saved and re-parsed</string>
+</resources>

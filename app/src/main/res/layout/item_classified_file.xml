@@ -37,15 +37,15 @@
         android:layout_height="wrap_content"
         android:minWidth="0dp"
         android:minHeight="0dp"
-        android:insetLeft="2dp"
-        android:insetRight="2dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"
-        android:text="修改"
+        android:text="@string/btn_modify"
         android:textSize="12sp"
         app:cornerRadius="14dp" />
 

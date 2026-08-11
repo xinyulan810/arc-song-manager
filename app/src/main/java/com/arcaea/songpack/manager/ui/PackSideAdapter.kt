@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.arcaea.songpack.databinding.ItemPackSideBinding
+import com.arcaea.songpack.R
 import com.arcaea.songpack.manager.model.Pack
 
 /** 编辑模式左侧曲包栏条目 */
@@ -73,7 +74,7 @@ class PackSideAdapter(
     inner class VH(private val b: ItemPackSideBinding) : RecyclerView.ViewHolder(b.root) {
         fun bind(item: PackSideItem) {
             b.sideName.text = item.pack.displayName
-            b.sideCount.text = "${item.songCount} 首"
+            b.sideCount.text = b.root.context.getString(R.string.song_count, item.songCount)
             b.root.isSelected = item.isCurrent
             b.root.isActivated = item.pack.id == activatedId
             b.root.setOnClickListener { onClick(item.pack) }

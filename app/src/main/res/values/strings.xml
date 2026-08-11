@@ -1,5 +1,15 @@
 <resources>
+    <!-- App 名称 -->
     <string name="app_name">arc自制谱管理工具</string>
+
+    <!-- 导入页 -->
+    <string name="import_subtitle">Arcaea 自制谱导入助手</string>
+    <string name="status_current">当前状态</string>
+    <string name="files_recognized">已识别文件</string>
+    <string name="btn_edit_songs">编辑歌曲</string>
+    <string name="btn_edit_raw">编辑源文件</string>
+    <string name="btn_restore_backup">恢复备份</string>
+    <string name="log_header">日志</string>
 
     <string name="select_archive">选择 zip/rar 压缩包</string>
     <string name="select_game_dir">选择/更换游戏目录</string>
@@ -8,6 +18,7 @@
     <string name="rescan">重新识别</string>
     <string name="status_no_archive">尚未选择压缩包</string>
 
+    <!-- 文件类型 -->
     <string name="file_type_aff">谱面 (.aff)</string>
     <string name="file_type_jacket">歌曲封面</string>
     <string name="file_type_jacket_thumb">封面_256</string>
@@ -16,9 +27,152 @@
     <string name="file_type_songlist">songlist 片段</string>
     <string name="file_type_unknown">未识别</string>
     <string name="file_type_ignore">忽略</string>
+    <string name="bg_label_with_hint">bg背景(标准1920x1440)</string>
 
     <string name="songlist_header">歌曲信息</string>
     <string name="songlist_empty">未找到 songlist 文件</string>
 
     <string name="manual_type">手动指定类型</string>
+    <string name="select_file_type">选择文件类型</string>
+    <string name="btn_modify">修改</string>
+
+    <!-- 通用按钮/对话框 -->
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="confirm">确认</string>
+    <string name="restore">恢复</string>
+    <string name="delete">删除</string>
+    <string name="ok">确定</string>
+    <string name="done">完成</string>
+    <string name="edit">编辑</string>
+    <string name="refresh">刷新</string>
+
+    <!-- 游戏目录选择 -->
+    <string name="select_game_dir_title">选择游戏目录</string>
+    <string name="first_use_msg">首次使用, 请选择游戏资源根目录(包含 songs 和 img 文件夹的目录)。选择后会自动保存。</string>
+    <string name="select_game_dir_msg">请选择游戏资源根目录（包含 songs 和 img 文件夹的目录，即 Arc6 / OpnArc_ 所在目录）。选择后会自动保存。</string>
+    <string name="go_select">去选择</string>
+    <string name="later">稍后再说</string>
+    <string name="later_short">稍后</string>
+    <string name="dir_selected">已选择游戏目录</string>
+    <string name="no_game_dir">未加载游戏目录\n请点击右上角菜单选择游戏资源根目录</string>
+    <string name="no_game_dir_btn">未加载游戏目录\n请点击右上角选择游戏资源根目录</string>
+
+    <!-- 曲包管理 -->
+    <string name="pack_manager">曲包管理</string>
+    <string name="search_hint">搜索歌曲（标题 / 艺术家 / id / 曲包）</string>
+    <string name="search_pack_hint">搜索本包歌曲</string>
+    <string name="fab_new_pack">新建曲包</string>
+    <string name="pack_created">曲包 %1$s 已创建</string>
+    <string name="pack_create_failed">创建失败: %1$s</string>
+    <string name="saved">已保存</string>
+    <string name="save_failed">保存失败: %1$s</string>
+    <string name="confirm_delete">确认删除</string>
+    <string name="cover_imported">封面已导入</string>
+    <string name="cover_import_failed">导入失败: %1$s</string>
+    <string name="no_packlist_backup">未找到 packlist.backup 备份文件</string>
+    <string name="restore_packlist">恢复 packlist</string>
+    <string name="restore_packlist_msg">将从 packlist.backup 恢复曲包列表（覆盖当前 packlist）。</string>
+    <string name="restore_packlist_old">恢复 packlist.backup（旧版）</string>
+
+    <!-- 包内歌曲 -->
+    <string name="pack_songs">曲包歌曲</string>
+    <string name="sort">排序</string>
+    <string name="sort_default">默认排序</string>
+    <string name="sort_by_time">按修改时间</string>
+    <string name="pack_empty">该曲包暂无歌曲</string>
+    <string name="edit_hint">长按歌曲拖动到左侧曲包，同包内拖动排序</string>
+    <string name="moving">正在移动…</string>
+    <string name="moving_name">正在移动「%1$s」…</string>
+    <string name="song_count">%1$d 首</string>
+    <string name="load_failed">加载失败: %1$s</string>
+
+    <!-- 歌曲详情 -->
+    <string name="song_detail">歌曲详情</string>
+    <string name="song_cover">歌曲封面</string>
+    <string name="pack_cover">曲包封面</string>
+    <string name="song_not_found">未在 songlist 中找到歌曲 %1$s</string>
+    <string name="edit_song_info">编辑歌曲信息</string>
+    <string name="edit_raw_songlist">编辑源 songlist(直接改文本)</string>
+    <string name="save_and_parse">保存并解析</string>
+    <string name="no_song_info">没有歌曲信息可编辑(请先识别 songlist)</string>
+    <string name="select_song">选择歌曲</string>
+    <string name="no_diff">无难度</string>
+    <string name="includes">包含: </string>
+    <string name="confirm_import">确认导入</string>
+    <string name="back_to_edit">返回修改</string>
+    <string name="duplicate_songs">检测到重复歌曲</string>
+    <string name="duplicate_msg">以下歌曲已存在于游戏 songlist 中:\n\n%1$s\n\n是否替换旧条目?</string>
+    <string name="replace">替换</string>
+    <string name="restore_backup_title">恢复备份</string>
+    <string name="move_song">移动歌曲到曲包</string>
+    <string name="move">移动</string>
+    <string name="moved_to">已移动到「%1$s」</string>
+    <string name="rename_song_id">重命名歌曲 id</string>
+    <string name="id_empty">id 不能为空</string>
+    <string name="id_duplicate">已存在同名歌曲: %1$s</string>
+    <string name="renamed_to">已重命名为 %1$s</string>
+    <string name="rename_failed">重命名失败: %1$s</string>
+    <string name="delete_song_title">删除歌曲「%1$s」</string>
+    <string name="delete_song_msg">将从 songlist 移除该条目，并删除歌曲文件夹 songs/%1$s/（不可恢复）。</string>
+    <string name="confirm_delete_song">确认删除</string>
+    <string name="deleted">已删除</string>
+    <string name="delete_failed">删除失败: %1$s</string>
+    <string name="move_pack">移动曲包</string>
+    <string name="rename_id">重命名 id</string>
+    <string name="delete_song">删除歌曲</string>
+
+    <!-- 歌曲字段标签 -->
+    <string name="field_id">歌曲 ID</string>
+    <string name="field_title_en">标题 (en)</string>
+    <string name="field_artist">艺术家</string>
+    <string name="field_bpm">BPM</string>
+    <string name="field_set">所属包</string>
+    <string name="field_side">Side (0/1)</string>
+    <string name="field_bg">背景图名</string>
+    <string name="field_audio">音乐文件名</string>
+    <string name="field_jacket">封面文件名</string>
+    <string name="field_version">版本</string>
+
+    <!-- 备份与还原 -->
+    <string name="backup_restore">备份与还原</string>
+    <string name="backup_hint">每次修改 songlist/packlist 前都会自动备份。点击快照可恢复，长按可删除。</string>
+    <string name="backup_empty">暂无备份快照\n进行任意修改保存后会自动生成</string>
+    <string name="fab_manual_backup">手动备份</string>
+    <string name="manual_backup_created">已创建手动备份</string>
+    <string name="backup_failed">备份失败: %1$s</string>
+    <string name="restore_snapshot">恢复快照 %1$s</string>
+    <string name="restore_snapshot_msg">将用该快照覆盖当前 %1$s\n\n恢复前会自动备份当前状态，可随时再还原。\n恢复后需返回上层刷新查看。</string>
+    <string name="restored_to">已恢复到 %1$s</string>
+    <string name="delete_snapshot">删除快照</string>
+    <string name="delete_snapshot_msg">确定删除 %1$s 的快照？</string>
+    <string name="restore_failed">恢复失败: %1$s</string>
+    <string name="snapshot_auto">自动</string>
+    <string name="snapshot_manual">手动</string>
+    <string name="snapshot_before_restore">恢复前</string>
+    <string name="backup">备份</string>
+
+    <!-- 底部导航 -->
+    <string name="nav_import">自制谱导入</string>
+    <string name="nav_manager">曲包管理</string>
+
+    <!-- 状态/识别提示 -->
+    <string name="recognized">识别完成: %1$d 个文件 / %2$d 首歌曲</string>
+    <string name="songlist_error">⚠ songlist 异常: %1$s</string>
+    <string name="songlist_parse_failed">songlist 解析失败: %1$s</string>
+    <string name="no_songlist_file">未找到标记为 songlist 的文件</string>
+    <string name="reading_archive">正在读取压缩包…</string>
+    <string name="parse_failed">解析失败: %1$s</string>
+    <string name="import_success_status">导入成功</string>
+    <string name="import_failed_status">导入失败</string>
+    <string name="import_success_toast">导入成功: %1$d 首歌曲</string>
+    <string name="select_game_dir_first">请先选择游戏目录</string>
+    <string name="no_songlist_to_import">没有解析到 songlist 条目, 无法导入</string>
+    <string name="cannot_access_dir">无法读取游戏目录或 songs 目录</string>
+    <string name="no_songlist_backup_file">未找到 songlist.backup 备份文件</string>
+    <string name="restoring">正在恢复…</string>
+    <string name="restore_success_status">恢复成功</string>
+    <string name="restore_failed_status">恢复失败</string>
+    <string name="restored_from_backup">已从备份恢复 songlist</string>
+    <string name="saved_and_reparsed">已保存并重新解析</string>
 </resources>

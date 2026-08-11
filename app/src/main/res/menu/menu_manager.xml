@@ -3,18 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_select_dir"
-        android:title="选择游戏目录"
+        android:title="@string/select_game_dir_title"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_refresh"
-        android:title="刷新"
+        android:title="@string/refresh"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_backup"
-        android:title="备份与还原"
+        android:title="@string/backup_restore"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_restore_packlist"
-        android:title="恢复 packlist.backup（旧版）"
+        android:title="@string/restore_packlist_old"
         app:showAsAction="never" />
 </menu>

@@ -12,7 +12,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/purple_700"
         app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
-        app:title="歌曲详情"
+        app:title="@string/song_detail"
         app:titleTextColor="@color/white" />
 
     <androidx.core.widget.NestedScrollView
@@ -36,7 +36,7 @@
                     android:id="@+id/songImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:contentDescription="歌曲封面"
+                    android:contentDescription="@string/song_cover"
                     android:scaleType="centerCrop" />
 
                 <TextView

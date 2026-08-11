@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:gravity="center"
-            android:text="Arcaea 自制谱导入助手"
+            android:text="@string/import_subtitle"
             android:textAppearance="?attr/textAppearanceBodySmall"
             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -48,7 +48,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="当前状态"
+                    android:text="@string/status_current"
                     android:textAppearance="?attr/textAppearanceLabelLarge"
                     android:textColor="@color/purple_700" />
 
@@ -70,8 +70,9 @@
             android:layout_marginTop="12dp"
             android:text="@string/select_archive" />
 
-        <!-- 已识别文件 + 歌曲信息, 横向 2:1, 两卡片等高(取内容较高者) -->
+        <!-- 已识别文件 + 歌曲信息, 横向 2:1 (窄屏自动转上下排列, 见 ImportFragment) -->
         <LinearLayout
+            android:id="@+id/twoColRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -79,6 +80,7 @@
 
             <!-- 已识别文件卡片(占 2/3) -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/filesCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
@@ -95,7 +97,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="已识别文件"
+                        android:text="@string/files_recognized"
                         android:textAppearance="?attr/textAppearanceLabelLarge"
                         android:textColor="@color/purple_700" />
 
@@ -111,6 +113,7 @@
             </com.google.android.material.card.MaterialCardView>
 
             <Space
+                android:id="@+id/twoColSpace"
                 android:layout_width="12dp"
                 android:layout_height="1dp" />
 
@@ -165,7 +168,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="编辑歌曲" />
+                android:text="@string/btn_edit_songs" />
 
             <Space
                 android:layout_width="6dp"
@@ -177,7 +180,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="编辑源文件" />
+                android:text="@string/btn_edit_raw" />
 
             <Space
                 android:layout_width="6dp"
@@ -189,7 +192,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="恢复备份" />
+                android:text="@string/btn_restore_backup" />
         </LinearLayout>
 
         <!-- 目录选择 + 导入 -->
@@ -238,7 +241,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="日志"
+                    android:text="@string/log_header"
                     android:textAppearance="?attr/textAppearanceLabelLarge"
                     android:textColor="@color/purple_700" />
 

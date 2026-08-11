@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import com.arcaea.songpack.databinding.ItemSongBinding
+import com.arcaea.songpack.R
 import com.arcaea.songpack.manager.GameRepository
 import com.arcaea.songpack.manager.model.SongItem
 import com.arcaea.songpack.model.SongDifficulty
@@ -46,7 +47,7 @@ class SongAdapter(
                 if (realDiffs.isNotEmpty()) {
                     append(realDiffs.joinToString(" ") { diffText(it) })
                 } else {
-                    append("无难度")
+                    append(b.root.context.getString(R.string.no_diff))
                 }
                 if (!e.artist.isNullOrBlank()) append(" ${e.artist}")
             }

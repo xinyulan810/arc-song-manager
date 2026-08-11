@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import com.arcaea.songpack.R
 import androidx.appcompat.app.AlertDialog
 
 /**
@@ -89,7 +90,7 @@ object UiUtil {
         AlertDialog.Builder(context)
             .setTitle(title)
             .setView(scroll)
-            .setPositiveButton("保存") { _, _ ->
+            .setPositiveButton(context.getString(R.string.save)) { _, _ ->
                 val values = mutableMapOf<String, Any>()
                 for ((key, view) in widgets) {
                     when (view) {
@@ -102,7 +103,7 @@ object UiUtil {
                     android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
                 }
             }
-            .setNegativeButton("取消") { _, _ -> }
+            .setNegativeButton(context.getString(R.string.cancel)) { _, _ -> }
             .show()
     }
 
@@ -116,7 +117,7 @@ object UiUtil {
         AlertDialog.Builder(context)
             .setTitle(title)
             .setItems(items) { _, which -> actions[which].second(which) }
-            .setNegativeButton("取消") { _, _ -> }
+            .setNegativeButton(context.getString(R.string.cancel)) { _, _ -> }
             .show()
     }
 }

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.arcaea.songpack.R
 import com.arcaea.songpack.databinding.ActivityPackSongsBinding
 import com.arcaea.songpack.manager.model.Pack
 import com.arcaea.songpack.manager.model.SongItem
@@ -96,10 +97,10 @@ class PackSongsActivity : AppCompatActivity() {
         binding.packSideList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         binding.packSideList.adapter = packSideAdapter
 
-        binding.btnSort.text = "默认排序"
+        binding.btnSort.text = getString(R.string.sort_default)
         binding.btnSort.setOnClickListener {
             sortMode = if (sortMode == 0) 1 else 0
-            binding.btnSort.text = if (sortMode == 0) "默认排序" else "按修改时间"
+            binding.btnSort.text = if (sortMode == 0) getString(R.string.sort_default) else getString(R.string.sort_by_time)
             refreshSongs()
         }
         binding.btnEditMode.setOnClickListener { setEditMode(!editMode) }
@@ -144,7 +145,7 @@ class PackSongsActivity : AppCompatActivity() {
                 refreshSideBar()
                 TimingLog.mark("PackSongs.loadData", t0, "TOTAL")
             } catch (e: Exception) {
-                Toast.makeText(this@PackSongsActivity, "加载失败: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@PackSongsActivity, getString(R.string.load_failed, e.message), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -204,7 +205,7 @@ class PackSongsActivity : AppCompatActivity() {
         songAdapter.editMode = on
         binding.packSideList.visibility = if (on) View.VISIBLE else View.GONE
         binding.editBar.visibility = if (on) View.VISIBLE else View.GONE
-        binding.btnEditMode.text = if (on) "完成" else "编辑"
+        binding.btnEditMode.text = if (on) getString(R.string.done) else getString(R.string.edit)
         if (on) {
             refreshSideBar()
         }
@@ -347,7 +348,7 @@ class PackSongsActivity : AppCompatActivity() {
         entry.raw.put("set", targetPack.id)
         val name = song.title.ifBlank { song.id }
         // 显示"正在移动"灰屏, 保存+刷新完成后消失
-        binding.moveOverlayText.text = "正在移动「$name」…"
+        binding.moveOverlayText.text = getString(R.string.moving_name, name)
         binding.moveOverlay.visibility = View.VISIBLE
         lifecycleScope.launch {
             try {
