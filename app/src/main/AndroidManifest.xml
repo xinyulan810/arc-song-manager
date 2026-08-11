@@ -72,6 +72,12 @@
             android:name=".manager.BackupActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- 曲包封面快速编辑器 -->
+        <activity
+            android:name=".cover.PackCoverEditorActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

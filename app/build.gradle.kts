@@ -11,8 +11,8 @@ android {
         applicationId = "com.arcaea.songpack"
         minSdk = 26
         targetSdk = 34
-        versionCode = 58
-        versionName = "5.8"
+        versionCode = 65
+        versionName = "6.0.5"
         // 计时日志开关: gradle assembleDebug -Ptiming=true 时输出加载耗时日志(仅用于性能分析)
         val timing = (project.findProperty("timing") as? String) == "true"
         buildConfigField("boolean", "TIMING_LOGS", timing.toString())
@@ -56,6 +56,8 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.activity:activity-ktx:1.9.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+    // 下拉刷新(曲包管理页)
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
     // SAF 文件树访问
     implementation("androidx.documentfile:documentfile:1.0.1")

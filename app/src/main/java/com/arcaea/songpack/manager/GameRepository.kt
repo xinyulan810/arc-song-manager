@@ -2,6 +2,8 @@ package com.arcaea.songpack.manager
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
@@ -14,10 +16,12 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Semaphore
 import com.arcaea.songpack.manager.model.Pack
 import com.arcaea.songpack.manager.model.SongItem
+import com.arcaea.songpack.manager.ui.ImageLoader
 import com.arcaea.songpack.model.SongEntry
 import com.arcaea.songpack.util.SonglistParser
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 
@@ -301,15 +305,18 @@ object GameRepository {
         for (f in files) {
             if (f.isDir) continue
             val name = f.name
-            val id = when {
-                name.startsWith("1080_select_") && name.endsWith(".png") ->
-                    name.removePrefix("1080_select_").removeSuffix(".png")
-                name.startsWith("select_") && name.endsWith(".png") ->
-                    name.removePrefix("select_").removeSuffix(".png")
-                else -> null
+            val uri = DocumentsContract.buildDocumentUriUsingTree(treeUri, f.docId)
+            val selectId = if (name.startsWith("select_") && name.endsWith(".png"))
+                name.removePrefix("select_").removeSuffix(".png") else null
+            if (selectId != null) {
+                // select_ 优先: 同名双文件残留时, 以游戏默认名 select_ 为准
+                result[selectId] = uri
+                continue
             }
-            if (id != null && !result.containsKey(id)) {
-                result[id] = DocumentsContract.buildDocumentUriUsingTree(treeUri, f.docId)
+            val hiId = if (name.startsWith("1080_select_") && name.endsWith(".png"))
+                name.removePrefix("1080_select_").removeSuffix(".png") else null
+            if (hiId != null && !result.containsKey(hiId)) {
+                result[hiId] = uri
             }
         }
         return result
@@ -394,14 +401,14 @@ object GameRepository {
         GameCache.putJacketUri(songId, uri)
     }
 
-    /** 曲包图 uri: 优先 1080_select, 回退 select。结果缓存。 */
+    /** 曲包图 uri: 优先 select(custom_banner=false 的默认名), 回退 1080_select。结果缓存。 */
     fun getPackImageUri(context: Context, packId: String): Uri? {
         GameCache.packImageUri(packId)?.let { return it }
         // File 直连(仅在自检通过时)
         if (FileStore.fileRoot != null) {
             val packDir = FileStore.packDir()
             if (packDir != null && packDir.isDirectory) {
-                val names = listOf("1080_select_$packId.png", "select_$packId.png")
+                val names = listOf("select_$packId.png", "1080_select_$packId.png")
                 for (n in names) {
                     val f = File(packDir, n)
                     if (f.isFile) { cachePackImage(packId, Uri.fromFile(f)); return Uri.fromFile(f) }
@@ -411,7 +418,7 @@ object GameRepository {
         }
         // SAF 回退
         val dir = gamePackDir(context) ?: return null
-        val candidates = listOf("1080_select_$packId.png", "select_$packId.png")
+        val candidates = listOf("select_$packId.png", "1080_select_$packId.png")
         for (name in candidates) {
             val doc = dir.findFile(name) ?: continue
             if (doc.isFile) { cachePackImage(packId, doc.uri); return doc.uri }
@@ -570,21 +577,19 @@ object GameRepository {
     // ---------- 曲包图操作 ----------
 
     fun importPackImage(context: Context, packId: String, srcUri: Uri): String? {
+        val customBanner = loadPacks(context).firstOrNull { it.id == packId }?.customBanner ?: false
         // File 直连
         val packDir = FileStore.packDir()
         if (packDir != null && packDir.isDirectory) {
             return try {
-                val f = File(packDir, "1080_select_$packId.png")
+                val target = resolvePackImageName(packId, customBanner) { File(packDir, it).isFile }
+                val f = File(packDir, target)
                 copyUriToFile(context, srcUri, f)
                 if (!isValidPngFile(f)) {
                     f.delete()
                     return "封面图片无效(不是有效的 PNG 文件), 已取消导入"
                 }
-                val plain = File(packDir, "select_$packId.png")
-                if (plain.isFile) {
-                    copyUriToFile(context, srcUri, plain)
-                    if (!isValidPngFile(plain)) plain.delete()
-                }
+                deleteOtherPackImage(packDir, packId, target)
                 GameCache.invalidate()
                 null
             } catch (e: Exception) {
@@ -593,22 +598,146 @@ object GameRepository {
         }
         val dir = gamePackDir(context) ?: return "未找到 songs/pack 目录"
         return try {
-            copyStreamToDoc(context, srcUri, dir, "1080_select_$packId.png")
-            val doc1080 = dir.findFile("1080_select_$packId.png")
-            if (doc1080 != null && !isValidPngDoc(context, doc1080)) {
-                doc1080.delete()
+            val target = resolvePackImageName(packId, customBanner) { name ->
+                dir.findFile(name)?.isFile == true
+            }
+            copyStreamToDoc(context, srcUri, dir, target)
+            val doc = dir.findFile(target)
+            if (doc != null && !isValidPngDoc(context, doc)) {
+                doc.delete()
                 return "封面图片无效(不是有效的 PNG 文件), 已取消导入"
             }
-            val plain = dir.findFile("select_$packId.png")
-            if (plain != null && plain.isFile) {
-                copyStreamToDoc(context, srcUri, dir, "select_$packId.png")
-                if (!isValidPngDoc(context, plain)) plain.delete()
+            otherPackImageName(packId, target)?.let { name ->
+                dir.findFile(name)?.takeIf { it.isFile }?.delete()
             }
             GameCache.invalidate()
             null
         } catch (e: Exception) {
             "图片复制失败: ${e.message}"
         }
+    }
+
+    /**
+     * 保存编辑器生成的封面: 只写游戏实际使用的那一个文件。
+     * 文件名由 packlist 决定(custom_banner=true → 1080_select_<id>.png, 否则 select_<id>.png);
+     * 若目录里已有旧封面则沿用旧文件名(兼容 extra 等特例)。写完后删除另一变体, 避免残留旧图。
+     * select 变体会按旧文件尺寸缩放, 避免破坏游戏对该包尺寸的预期(如 vegchi 原图 320x640)。
+     */
+    fun savePackCover(context: Context, packId: String, pngFile: File): String? {
+        val customBanner = loadPacks(context).firstOrNull { it.id == packId }?.customBanner ?: false
+        // File 直连
+        val packDir = FileStore.packDir()
+        if (packDir != null && (packDir.isDirectory || packDir.mkdirs())) {
+            return try {
+                val target = resolvePackImageName(packId, customBanner) { File(packDir, it).isFile }
+                writePackImageFile(packDir, target, pngFile)
+                deleteOtherPackImage(packDir, packId, target)
+                ImageLoader.clearCache()
+                GameCache.invalidate()
+                null
+            } catch (e: Exception) {
+                "保存失败: ${e.message}"
+            }
+        }
+        // SAF 回退
+        val songsDir = gameSongsDir(context) ?: return "未找到 songs 目录"
+        val pack = songsDir.findFile("pack") ?: songsDir.createDirectory("pack")
+            ?: return "无法创建 songs/pack 目录"
+        return try {
+            val target = resolvePackImageName(packId, customBanner) { name ->
+                pack.findFile(name)?.isFile == true
+            }
+            writePackImageDoc(context, pack, target, pngFile)
+            otherPackImageName(packId, target)?.let { name ->
+                pack.findFile(name)?.takeIf { it.isFile }?.delete()
+            }
+            ImageLoader.clearCache()
+            GameCache.invalidate()
+            null
+        } catch (e: Exception) {
+            "保存失败: ${e.message}"
+        }
+    }
+
+    /**
+     * 决定曲包封面实际写入的文件名: 已有文件优先沿用(游戏实际用的名字),
+     * 但 packlist 规则优先——custom_banner=true 用 1080_select_<id>.png,
+     * 否则用 select_<id>.png; 同曲包双文件残留时以 packlist 规则为准, 兼容 extra 等特例。
+     */
+    private fun resolvePackImageName(packId: String, customBanner: Boolean, has: (String) -> Boolean): String {
+        val select = "select_$packId.png"
+        val hi = "1080_select_$packId.png"
+        return if (customBanner) {
+            if (has(hi)) hi else select
+        } else {
+            if (has(select)) select else hi
+        }
+    }
+
+    /** 与 target 同曲包的另一变体文件名; 若 target 不是这两种则返回 null */
+    private fun otherPackImageName(packId: String, target: String): String? {
+        val select = "select_$packId.png"
+        val hi = "1080_select_$packId.png"
+        return when (target) {
+            hi -> select
+            select -> hi
+            else -> null
+        }
+    }
+
+    private fun deleteOtherPackImage(packDir: File, packId: String, target: String) {
+        otherPackImageName(packId, target)?.let {
+            File(packDir, it).takeIf { f -> f.isFile }?.delete()
+        }
+    }
+
+    /** 写入曲包图: 若目标已存在且尺寸与生成的封面不同, 按旧尺寸缩放, 避免破坏游戏预期尺寸 */
+    private fun writePackImageFile(packDir: File, name: String, pngFile: File) {
+        val target = File(packDir, name)
+        if (target.isFile) {
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(target.absolutePath, bounds)
+            val srcBounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(pngFile.absolutePath, srcBounds)
+            if (bounds.outWidth > 0 && bounds.outHeight > 0 &&
+                (bounds.outWidth != srcBounds.outWidth || bounds.outHeight != srcBounds.outHeight)
+            ) {
+                target.writeBytes(scalePng(pngFile, bounds.outWidth, bounds.outHeight))
+                return
+            }
+        }
+        target.writeBytes(pngFile.readBytes())
+    }
+
+    /** 写入曲包图(SAF): 若目标已存在且尺寸不同, 按旧尺寸缩放 */
+    private fun writePackImageDoc(context: Context, pack: DocumentFile, name: String, pngFile: File) {
+        val target = pack.findFile(name)
+        if (target != null && target.isFile) {
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            context.contentResolver.openInputStream(target.uri)?.use {
+                BitmapFactory.decodeStream(it, null, bounds)
+            }
+            val srcBounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeFile(pngFile.absolutePath, srcBounds)
+            if (bounds.outWidth > 0 && bounds.outHeight > 0 &&
+                (bounds.outWidth != srcBounds.outWidth || bounds.outHeight != srcBounds.outHeight)
+            ) {
+                writeBytesToDoc(context, pack, name, scalePng(pngFile, bounds.outWidth, bounds.outHeight))
+                return
+            }
+        }
+        copyFileToDoc(context, pngFile, pack, name)
+    }
+
+    /** 把 PNG 缩放到指定尺寸, 返回 PNG 字节 */
+    private fun scalePng(src: File, w: Int, h: Int): ByteArray {
+        val bmp = BitmapFactory.decodeFile(src.absolutePath) ?: return src.readBytes()
+        val scaled = Bitmap.createScaledBitmap(bmp, w, h, true)
+        val out = ByteArrayOutputStream()
+        scaled.compress(Bitmap.CompressFormat.PNG, 100, out)
+        if (scaled !== bmp) scaled.recycle()
+        bmp.recycle()
+        return out.toByteArray()
     }
 
     /** 校验 File 是否为有效 PNG(检查文件头 89 50 4E 47) */
@@ -750,6 +879,30 @@ object GameRepository {
         context.contentResolver.openOutputStream(doc.uri)?.use { out ->
             context.contentResolver.openInputStream(srcUri)?.use { ins -> ins.copyTo(out) }
                 ?: throw IOException("无法读取源文件")
+        } ?: throw IOException("无法写入文件: $name")
+    }
+
+    private fun copyFileToDoc(context: Context, src: File, parent: DocumentFile, name: String) {
+        parent.findFile(name)?.delete()
+        val doc = parent.createFile("application/octet-stream", name)
+            ?: throw IOException("无法创建文件: $name")
+        if (doc.name != name) {
+            if (!doc.renameTo(name)) throw IOException("无法创建文件 $name (系统将文件名改为 ${doc.name})")
+        }
+        context.contentResolver.openOutputStream(doc.uri)?.use { out ->
+            src.inputStream().use { ins -> ins.copyTo(out) }
+        } ?: throw IOException("无法写入文件: $name")
+    }
+
+    private fun writeBytesToDoc(context: Context, parent: DocumentFile, name: String, bytes: ByteArray) {
+        parent.findFile(name)?.delete()
+        val doc = parent.createFile("application/octet-stream", name)
+            ?: throw IOException("无法创建文件: $name")
+        if (doc.name != name) {
+            if (!doc.renameTo(name)) throw IOException("无法创建文件 $name (系统将文件名改为 ${doc.name})")
+        }
+        context.contentResolver.openOutputStream(doc.uri)?.use { out ->
+            out.write(bytes)
         } ?: throw IOException("无法写入文件: $name")
     }
 

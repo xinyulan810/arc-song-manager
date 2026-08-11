@@ -1,6 +1,7 @@
 package com.arcaea.songpack.manager.ui
 
 import android.content.Context
+import android.content.res.Configuration
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,38 @@ import androidx.appcompat.app.AlertDialog
 object UiUtil {
 
     enum class FieldType { TEXT, NUMBER, CHECKBOX }
+
+    /**
+     * 网格列数: 按屏幕宽度保证每张卡片可读。
+     *
+     * 规则:
+     *  - 每列至少 [minCardWidthDp] 宽(另加 12dp 卡片间距), 由可用宽度算出最多能放几列
+     *  - 手机(宽度 < 600dp): 竖屏最多 2 列, 横屏最多 3 列
+     *  - 平板(宽度 >= 600dp): 按宽度排, 最多 [maxColumns] 列
+     */
+    fun gridColumnsFor(context: Context, minCardWidthDp: Int = 150, maxColumns: Int = 5): Int {
+        val cfg = context.resources.configuration
+        val widthDp = cfg.screenWidthDp
+        val isTablet = widthDp >= 600
+        val max = if (isTablet) maxColumns else if (cfg.orientation == Configuration.ORIENTATION_LANDSCAPE) 3 else 2
+        // 减去 RecyclerView 左右 padding(12dp * 2)
+        return gridColumnsForWidth(widthDp - 24, isTablet, max, minCardWidthDp)
+    }
+
+    /**
+     * 基于给定可用宽度(不含左右 padding, 单位 dp)计算网格列数。
+     * 供网格实际宽度与屏幕宽度不一致的场景使用(如编辑模式下有侧栏占宽)。
+     */
+    fun gridColumnsForWidth(
+        availWidthDp: Int,
+        isTablet: Boolean,
+        maxColumns: Int,
+        minCardWidthDp: Int = 150
+    ): Int {
+        val avail = availWidthDp.coerceAtLeast(1)
+        val byWidth = (avail / (minCardWidthDp + 12)).coerceAtLeast(2)
+        return byWidth.coerceAtMost(maxColumns)
+    }
 
     data class FieldSpec(
         val key: String,

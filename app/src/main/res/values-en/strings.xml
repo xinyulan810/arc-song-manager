@@ -157,6 +157,14 @@
     <string name="nav_manager">Manage</string>
     <string name="nav_settings">Settings</string>
 
+    <!-- Cover editor -->
+    <string name="cover_editor_title">Edit Cover</string>
+    <string name="cover_hint">Drag to move · Pinch to zoom · Double-tap to reset</string>
+    <string name="cover_reset">Reset</string>
+    <string name="cover_save">Save</string>
+    <string name="cover_saved">Cover saved</string>
+    <string name="cover_load_failed">Failed to load image</string>
+
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="language">Language</string>

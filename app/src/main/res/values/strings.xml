@@ -157,6 +157,14 @@
     <string name="nav_manager">曲包管理</string>
     <string name="nav_settings">设置</string>
 
+    <!-- 封面编辑器 -->
+    <string name="cover_editor_title">编辑封面</string>
+    <string name="cover_hint">拖动调整位置 · 双指缩放 · 双击复位</string>
+    <string name="cover_reset">重置</string>
+    <string name="cover_save">保存</string>
+    <string name="cover_saved">封面已保存</string>
+    <string name="cover_load_failed">图片加载失败</string>
+
     <!-- 设置页 -->
     <string name="settings_title">设置</string>
     <string name="language">语言</string>

@@ -1,7 +1,6 @@
 package com.arcaea.songpack.home
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -14,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.arcaea.songpack.R
+import com.arcaea.songpack.cover.PackCoverEditorActivity
 import com.arcaea.songpack.databinding.ActivityManagerBinding
 import com.arcaea.songpack.manager.BackupActivity
 import com.arcaea.songpack.manager.FileStore
@@ -26,6 +26,7 @@ import com.arcaea.songpack.manager.model.Pack
 import com.arcaea.songpack.manager.ui.PackAdapter
 import com.arcaea.songpack.manager.ui.PackWithCount
 import com.arcaea.songpack.manager.ui.UiUtil
+import com.arcaea.songpack.manager.ui.ImageLoader
 import com.arcaea.songpack.model.SongEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -71,7 +72,10 @@ class ManagerFragment : Fragment() {
         val packId = pendingImagePackId
         pendingImagePackId = null
         if (uri != null && packId != null) {
-            importPackImage(packId, uri)
+            val intent = Intent(requireContext(), PackCoverEditorActivity::class.java)
+            intent.putExtra(PackCoverEditorActivity.EXTRA_PACK_ID, packId)
+            intent.putExtra(PackCoverEditorActivity.EXTRA_IMAGE_URI, uri)
+            startActivity(intent)
         }
     }
 
@@ -88,8 +92,15 @@ class ManagerFragment : Fragment() {
         binding.toolbar.inflateMenu(R.menu.menu_manager)
         binding.toolbar.setOnMenuItemClickListener { onMenuClick(it) }
 
-        binding.packGrid.layoutManager = GridLayoutManager(requireContext(), 5)
+        // 列数按屏幕宽度自适应: 手机竖屏 2 列 / 横屏最多 3 列 / 平板最多 5 列, 保证卡片文字可读
+        binding.packGrid.layoutManager = GridLayoutManager(requireContext(), UiUtil.gridColumnsFor(requireContext()))
         binding.packGrid.adapter = adapter
+
+        // 下拉刷新: 重新检测曲包/歌曲并刷新缩略图(无文字提示, 用户都懂)
+        binding.pullRefresh.setColorSchemeResources(R.color.purple_500)
+        binding.pullRefresh.setOnRefreshListener {
+            refreshData()
+        }
 
         binding.fabAddPack.setOnClickListener { showAddPackDialog() }
 
@@ -144,7 +155,7 @@ class ManagerFragment : Fragment() {
                 true
             }
             R.id.action_refresh -> {
-                loadData()
+                refreshData()
                 true
             }
             R.id.action_backup -> {
@@ -160,6 +171,17 @@ class ManagerFragment : Fragment() {
     }
 
     // ---------- 数据加载 ----------
+
+    /** 彻底重新检测: 清空内存缓存(曲包/歌曲/封面uri)与图片位图缓存, 再从磁盘重读 */
+    private fun refreshData() {
+        if (!GameRepository.isGameDirReady(requireContext())) {
+            binding.pullRefresh.isRefreshing = false
+            return
+        }
+        GameCache.invalidate()
+        ImageLoader.clearCache()
+        loadData()
+    }
 
     private fun loadData() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -194,6 +216,8 @@ class ManagerFragment : Fragment() {
                 binding.toolbar.subtitle = "共 ${allSongs.size} 首歌曲 / ${allPacks.size} 个曲包"
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), getString(R.string.load_failed, e.message), Toast.LENGTH_LONG).show()
+            } finally {
+                if (_binding != null) binding.pullRefresh.isRefreshing = false
             }
         }
     }
@@ -254,7 +278,7 @@ class ManagerFragment : Fragment() {
             "「${pack.displayName}」",
             listOf(
                 "编辑信息" to { editPack(pack) },
-                "更换封面（374×615，3:5）" to {
+                "编辑封面" to {
                     pendingImagePackId = pack.id
                     pickImageLauncher.launch("image/*")
                 },
@@ -392,21 +416,6 @@ class ManagerFragment : Fragment() {
             }
             .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
             .show()
-    }
-
-    private fun importPackImage(packId: String, uri: Uri) {
-        val ctx = requireContext()
-        viewLifecycleOwner.lifecycleScope.launch {
-            val err = withContext(Dispatchers.IO) {
-                GameRepository.importPackImage(ctx, packId, uri)
-            }
-            if (err == null) {
-                Toast.makeText(ctx, getString(R.string.cover_imported), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(ctx, getString(R.string.cover_import_failed, err), Toast.LENGTH_LONG).show()
-            }
-            loadData()
-        }
     }
 
     // ---------- 备份恢复 ----------

@@ -81,7 +81,7 @@ class ManagerActivity : AppCompatActivity() {
         binding.toolbar.inflateMenu(R.menu.menu_manager)
         binding.toolbar.setOnMenuItemClickListener { onMenuClick(it) }
 
-        binding.packGrid.layoutManager = GridLayoutManager(this, 5)
+        binding.packGrid.layoutManager = GridLayoutManager(this, UiUtil.gridColumnsFor(this))
         binding.packGrid.adapter = adapter
 
         binding.fabAddPack.setOnClickListener { showAddPackDialog() }

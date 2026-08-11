@@ -2,6 +2,7 @@ package com.arcaea.songpack.manager
 
 import android.content.ClipData
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.DragEvent
 import android.view.View
@@ -17,6 +18,7 @@ import com.arcaea.songpack.manager.model.SongItem
 import com.arcaea.songpack.manager.ui.PackSideAdapter
 import com.arcaea.songpack.manager.ui.PackSideItem
 import com.arcaea.songpack.manager.ui.SongAdapter
+import com.arcaea.songpack.manager.ui.UiUtil
 import com.arcaea.songpack.model.SongEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -93,6 +95,8 @@ class PackSongsActivity : AppCompatActivity() {
 
         binding.songGrid.layoutManager = GridLayoutManager(this, 5)
         binding.songGrid.adapter = songAdapter
+        // 歌曲网格按实际可用宽度自适应列数(编辑模式有左侧栏占宽)
+        binding.songGrid.post { applySongGridColumns() }
 
         binding.packSideList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         binding.packSideList.adapter = packSideAdapter
@@ -206,9 +210,23 @@ class PackSongsActivity : AppCompatActivity() {
         binding.packSideList.visibility = if (on) View.VISIBLE else View.GONE
         binding.editBar.visibility = if (on) View.VISIBLE else View.GONE
         binding.btnEditMode.text = if (on) getString(R.string.done) else getString(R.string.edit)
+        // 侧栏显示/隐藏会改变网格可用宽度, 重新计算列数
+        binding.songGrid.post { applySongGridColumns() }
         if (on) {
             refreshSideBar()
         }
+    }
+
+    /** 按网格实际宽度(去掉 padding)计算列数, 与曲包网格同一套规则 */
+    private fun applySongGridColumns() {
+        val wDp = (binding.songGrid.width / resources.displayMetrics.density).toInt()
+        if (wDp <= 0) return // 尚未测量完成, 等下一次 post
+        val cfg = resources.configuration
+        val isTablet = cfg.screenWidthDp >= 600
+        val max = if (isTablet) 5 else if (cfg.orientation == Configuration.ORIENTATION_LANDSCAPE) 3 else 2
+        // 歌曲网格 padding 8dp * 2
+        val cols = UiUtil.gridColumnsForWidth(wDp - 16, isTablet, max)
+        (binding.songGrid.layoutManager as? GridLayoutManager)?.spanCount = cols
     }
 
     // ---------- 拖拽 ----------
